@@ -1,5 +1,6 @@
-const {registerHandler} = require('./handlers-register');
+const { registerHandler } = require('./handlers-register');
 const { loginHandler } = require('./handlers-login');
+const Joi = require('@hapi/joi');
 
 const {
   addProductHandler,
@@ -7,6 +8,7 @@ const {
   getProductByIdHandler,
   editProductByIdHandler,
   deleteProductByIdHandler,
+  getCategoryHandler,
 } = require('./handlers-products');
 
 const {
@@ -17,8 +19,6 @@ const {
   deleteStoreByIdHandler,
 } = require('./handlers-stores');
 
-
-  
 const routes = [
   {
     method: 'POST',
@@ -43,12 +43,27 @@ const routes = [
   {
     method: 'POST',
     path: '/products',
+    options: {
+      validate: {
+        payload: Joi.object({
+          productName: Joi.string().required(),
+          category: Joi.string().required(),
+          price: Joi.number().required(),
+          description: Joi.string().required(),
+        }),
+      },
+    },
     handler: addProductHandler,
   },
   {
     method: 'GET',
     path: '/products',
     handler: getAllProductsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/products/category',
+    handler: getCategoryHandler,
   },
   {
     method: 'GET',
@@ -58,6 +73,16 @@ const routes = [
   {
     method: 'PUT',
     path: '/products/{id}',
+    options: {
+      validate: {
+        payload: Joi.object({
+          productName: Joi.string().optional(),
+          category: Joi.string().optional(),
+          price: Joi.number().optional(),
+          description: Joi.string().optional(),
+        }),
+      },
+    },
     handler: editProductByIdHandler,
   },
   {
@@ -68,6 +93,14 @@ const routes = [
   {
     method: 'POST',
     path: '/stores',
+    options: {
+      validate: {
+        payload: Joi.object({
+          storeName: Joi.string().required(),
+          address: Joi.string().required(),
+        }),
+      },
+    },
     handler: addStoreHandler,
   },
   {
@@ -83,6 +116,14 @@ const routes = [
   {
     method: 'PUT',
     path: '/stores/{id}',
+    options: {
+      validate: {
+        payload: Joi.object({
+          storeName: Joi.string().optional(),
+          address: Joi.string().optional(),
+        }),
+      },
+    },
     handler: editStoreByIdHandler,
   },
   {

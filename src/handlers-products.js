@@ -1,37 +1,36 @@
 const { nanoid } = require('nanoid');
-const products = require('./products');
+const { Products, createProduct } = require('../models/products');
 
 const addProductHandler = (request, h) => {
+  const productId = nanoid(10);
   // getting body request in Hapi with request.payload
-  const { productName, category, price } = request.payload;
-  const id = nanoid(16);
-  const insertedAt = new Date().toISOString();
-  const updatedAt = insertedAt;
+  const {
+    productName,
+    category,
+    price,
+    description,
+  } = request.payload;
 
-  // property already complete, then push into array products
-  const newProduct = {
-    id, productName, category, price, insertedAt, updatedAt,
-  };
+  // insert into table products
+  createProduct(productId, productName, category, price, description);
 
-  products.push(newProduct);
+  // check if the record are available
+  const isFound = Products.findAll();
 
-  // check if id are available
-  const isIdFound = products.filter((product) => product.id === id).length > 0;
-
-  // condition if product have added to array products
-  if (isIdFound) {
+  // condition if product have added to table products
+  if (isFound) {
     const response = h.response({
       status: 'success',
       message: 'product has been successfully added',
       data: {
-        productId: id,
+        productId,
       },
     });
     response.code(201);
     return response;
   }
 
-  // condition if product are not added to array products
+  // condition if product are not added to table products
   const response = h.response({
     status: 'fail',
     message: 'product failed to add',
@@ -40,68 +39,67 @@ const addProductHandler = (request, h) => {
   return response;
 };
 
-const getAllProductsHandler = () => ({
-  status: 'success',
-  data: {
-    products: products.map((product) => ({
-      name: product.productName,
-      category: product.category,
-      price: product.price,
-    })),
-  },
-});
-
-const getProductByIdHandler = (request, h) => {
-  // getting id from request parameter
-  const { id } = request.params;
-
-  // getting product object by id filtering
-  const product = products.filter((p) => p.id === id)[0];
-
-  // conditioning if there is product
-  if (product !== undefined) {
-    return {
-      status: 'success',
-      data: {
-        product,
-      },
-    };
+const getAllProductsHandler = async (request, h) => {
+  try {
+    // sequelize syntax to get all record
+    const products = await Products.findAll();
+    return h.response(products);
+  } catch (error) {
+    return h.response(error).code(500);
   }
-
-  // response if product can not be found
-  const response = h.response({
-    status: 'fail',
-    message: 'product can not be found!',
-  });
-  response.code(404);
-  return response;
 };
 
-const editProductByIdHandler = (request, h) => {
-  const { id } = request.params;
+const getCategoryHandler = async (request, h) => {
+  try {
+    // sequelize syntax to get all record
+    const products = await Products.findAll({ where: { category: request.payload.category } });
+    return h.response(products);
+  } catch (error) {
+    return h.response(error).code(500);
+  }
+};
 
-  const { productName, category, price } = request.payload;
-  const updatedAt = new Date().toISOString();
+const getProductByIdHandler = async (request, h) => {
+  try {
+    // sequelize syntax to get record by primary key
+    const product = await Products.findByPk(request.params.id);
+    return h.response(product);
+  } catch (error) {
+    return h.response(error).code(500);
+  }
+};
 
-  // indexing array to update the product (catching the id)
-  const index = products.findIndex((product) => product.id === id);
+const editProductByIdHandler = async (request, h) => {
+  try {
+    // getting id from request parameter
+    const { id } = request.params;
 
-  // condition if index is true
-  if (index !== -1) {
-    products[index] = {
-      ...products[index],
+    const {
       productName,
       category,
       price,
-      updatedAt,
-    };
+      description,
+    } = request.payload;
 
-    const response = h.response({
-      status: 'success',
-      message: 'product has been successfully edited',
-    });
-    response.code(200);
-    return response;
+    const findId = await Products.findByPk(id);
+
+    if (findId !== null) {
+      // sequelize syntax to set/update record
+      Products.update({
+        productName,
+        category,
+        price,
+        description,
+      }, { where: { productId: id } });
+
+      const response = h.response({
+        status: 'success',
+        message: 'product has been successfully edited',
+      });
+      return response.code(200);
+    }
+  } catch (error) {
+    return h.response(error).code(500);
   }
 
   // response when id can't be found
@@ -109,38 +107,37 @@ const editProductByIdHandler = (request, h) => {
     status: 'fail',
     message: 'failed to edit the product, id can\'t be found',
   });
-  response.code(404);
+  response.code(400);
   return response;
 };
 
-const deleteProductByIdHandler = (request, h) => {
-  const { id } = request.params;
-
-  const index = products.findIndex((product) => product.id === id);
-
-  // condition if index is available
-  if (index !== -1) {
-    products.splice(index, 1);
-    const response = h.response({
-      status: 'success',
-      message: 'product has been successfully deleted',
-    });
-    response.code(200);
-    return response;
+const deleteProductByIdHandler = async (request, h) => {
+  try {
+    // sequelize syntax to delete record from table products
+    const drop = await Products.destroy({ where: { productId: request.params.id } });
+    if (drop) {
+      const response = h.response({
+        status: 'success',
+        message: 'product has been successfully deleted',
+      });
+      return response.code(200);
+    }
+  } catch (error) {
+    return h.response(error).code(500);
   }
 
-  // response if fail
+  // response when id can't be found
   const response = h.response({
     status: 'fail',
     message: 'failed to delete the product, id can\'t be found',
   });
-  response.code(404);
-  return response;
+  return response.code(400);
 };
 
 module.exports = {
   addProductHandler,
   getAllProductsHandler,
+  getCategoryHandler,
   getProductByIdHandler,
   editProductByIdHandler,
   deleteProductByIdHandler,

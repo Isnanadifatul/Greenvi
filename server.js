@@ -29,7 +29,7 @@ const init = async () => {
         isHttpOnly: true,
         clearInvalid: false,
         strictHeader: true,
-      });
+    });
 
     await server.register([{
         plugin: require("hapi-geo-locate"),
@@ -46,25 +46,21 @@ const init = async () => {
     {
         plugin: require('@hapi/cookie')
     },
-]);
+    ]);
 
-// Konfigurasi rendering view dengan handlebars (contoh)
-server.views({
-    engines: {
-      html: require('handlebars'),
-    },
-    relativeTo: __dirname,
-    path: 'views', // Pastikan ini sesuai dengan struktur folder proyek Anda
-  });
-
-
-
+    // Konfigurasi rendering view dengan handlebars (contoh)
+    server.views({
+        engines: {
+            html: require('handlebars'),
+        },
+        relativeTo: __dirname,
+        path: 'views', // Pastikan ini sesuai dengan struktur folder proyek Anda
+    });
 
     server.route(routes);
 
     await server.start();
-    console.log(`S
-    erver started on: ${server.info.uri}`);
+    console.log(`Server started on: ${server.info.uri}`);
 };
 
 process.on('unhandledRejection', (err) => {
