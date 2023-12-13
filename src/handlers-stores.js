@@ -1,35 +1,31 @@
 const { nanoid } = require('nanoid');
-const stores = require('./stores');
+const { Stores, createStore } = require('../models/stores');
 
 const addStoreHandler = (request, h) => {
-  // getting body request in Hapi using request.payload
+  const storeId = nanoid(10);
+  // getting body request in Hapi with request.payload
   const { storeName, address } = request.payload;
-  const id = nanoid(16);
 
-  // property already complete, then push into array stores
-  const newStore = {
-    id, storeName, address,
-  };
+  // insert into table stores
+  createStore(storeId, storeName, address);
 
-  stores.push(newStore);
+  // check if the record are available
+  const isFound = Stores.findAll();
 
-  // check if id are available
-  const isIdFound = stores.filter((store) => store.id === id).length > 0;
-
-  // condition if store have added to array stores
-  if (isIdFound) {
+  // condition if store have added to table stores
+  if (isFound) {
     const response = h.response({
       status: 'success',
       message: 'store has been successfully added',
       data: {
-        storeId: id,
+        storeId,
       },
     });
     response.code(201);
     return response;
   }
 
-  // condition if store are not added to array stores
+  // condition if store are not added to table stores
   const response = h.response({
     status: 'fail',
     message: 'store failed to add',
@@ -38,64 +34,50 @@ const addStoreHandler = (request, h) => {
   return response;
 };
 
-const getAllStoresHandler = () => ({
-  status: 'success',
-  data: {
-    stores: stores.map((store) => ({
-      name: store.storeName,
-      address: store.address,
-    })),
-  },
-});
-
-const getStoreByIdHandler = (request, h) => {
-  // getting id from request parameter
-  const { id } = request.params;
-
-  // getting store object by id filtering
-  const store = stores.filter((s) => s.id === id)[0];
-
-  // conditioning if there is store
-  if (store !== undefined) {
-    return {
-      status: 'success',
-      data: {
-        store,
-      },
-    };
+const getAllStoresHandler = async (request, h) => {
+  try {
+    // sequelize syntax to get all record
+    const stores = await Stores.findAll();
+    return h.response(stores);
+  } catch (error) {
+    return h.response(error).code(500);
   }
-
-  // response if store can not be found
-  const response = h.response({
-    status: 'fail',
-    message: 'store can not be found!',
-  });
-  response.code(404);
-  return response;
 };
 
-const editStoreByIdHandler = (request, h) => {
-  const { id } = request.params;
+const getStoreByIdHandler = async (request, h) => {
+  try {
+    // sequelize syntax to get record by primary key
+    const store = await Stores.findByPk(request.params.id);
+    return h.response(store);
+  } catch (error) {
+    return h.response(error).code(500);
+  }
+};
 
-  const { storeName, address } = request.payload;
+const editStoreByIdHandler = async (request, h) => {
+  try {
+    // getting id from request parameter
+    const { id } = request.params;
 
-  // indexing array to update the store (catching the id)
-  const index = stores.findIndex((store) => store.id === id);
+    const { storeName, address } = request.payload;
 
-  // condition if index is true
-  if (index !== -1) {
-    stores[index] = {
-      ...stores[index],
-      storeName,
-      address,
-    };
+    const findId = await Stores.findByPk(id);
 
-    const response = h.response({
-      status: 'success',
-      message: 'store has been successfully edited',
-    });
-    response.code(200);
-    return response;
+    if (findId !== null) {
+      // sequelize syntax to set/update record
+      Stores.update({
+        storeName,
+        address,
+      }, { where: { storeId: id } });
+
+      const response = h.response({
+        status: 'success',
+        message: 'store has been successfully edited',
+      });
+      return response.code(200);
+    }
+  } catch (error) {
+    return h.response(error).code(500);
   }
 
   // response when id can't be found
@@ -103,33 +85,32 @@ const editStoreByIdHandler = (request, h) => {
     status: 'fail',
     message: 'failed to edit the store, id can\'t be found',
   });
-  response.code(404);
+  response.code(400);
   return response;
 };
 
-const deleteStoreByIdHandler = (request, h) => {
-  const { id } = request.params;
+const deleteStoreByIdHandler = async (request, h) => {
+  try {
+    // sequelize syntax to delete record from table stores
+    const drop = await Stores.destroy({ where: { storeId: request.params.id } });
 
-  const index = stores.findIndex((store) => store.id === id);
-
-  // condition if index is available
-  if (index !== -1) {
-    stores.splice(index, 1);
-    const response = h.response({
-      status: 'success',
-      message: 'store has been successfully deleted',
-    });
-    response.code(200);
-    return response;
+    if (drop) {
+      const response = h.response({
+        status: 'success',
+        message: 'store has been successfully deleted',
+      });
+      return response.code(200);
+    }
+  } catch (error) {
+    return h.response(error).code(500);
   }
 
-  // response if fail
+  // response when id can't be found
   const response = h.response({
     status: 'fail',
     message: 'failed to delete the store, id can\'t be found',
   });
-  response.code(404);
-  return response;
+  return response.code(400);
 };
 
 module.exports = {
