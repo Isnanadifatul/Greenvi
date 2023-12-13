@@ -4,27 +4,28 @@
   "description": "ini adalah branch untuk development",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/server.js",
-    "dev": "nodemon ./src/server.js",
+    "start": "node server.js",
+    "dev": "server.js",
     "lint": "eslint ./"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-
   "dependencies": {
     "@hapi/basic": "^7.0.2",
     "@hapi/boom": "^10.0.1",
     "@hapi/cookie": "^12.0.1",
     "@hapi/hapi": "^21.3.2",
     "@hapi/inert": "^7.1.0",
+    "@hapi/joi": "^17.1.1",
     "@hapi/vision": "^7.0.3",
+    "bcrypt": "^5.1.1",
     "handlebars": "^4.7.8",
     "hapi-geo-locate": "^4.1.1",
     "mysql2": "^3.6.5",
     "nanoid": "^3.3.7",
     "sequelize": "^6.35.1"
-},
+  },
   "devDependencies": {
     "eslint": "^8.54.0",
     "eslint-config-airbnb-base": "^15.0.0",
