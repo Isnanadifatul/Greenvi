@@ -1,3 +1,6 @@
+const {registerHandler} = require('./handlers-register');
+const { loginHandler } = require('./handlers-login');
+
 const {
   addProductHandler,
   getAllProductsHandler,
@@ -14,7 +17,29 @@ const {
   deleteStoreByIdHandler,
 } = require('./handlers-stores');
 
+
+  
 const routes = [
+  {
+    method: 'POST',
+    path: '/register',
+    handler: registerHandler,
+  },
+  {
+    method: 'GET',
+    path: '/register',
+    handler: (request, h) => h.view('register'),
+  },
+  {
+    method: 'POST',
+    path: '/login',
+    handler: loginHandler,
+  },
+  {
+    method: 'GET',
+    path: '/login',
+    handler: (request, h) => h.view('login'),
+  },
   {
     method: 'POST',
     path: '/products',

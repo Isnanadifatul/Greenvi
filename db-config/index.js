@@ -2,9 +2,9 @@ const Sequelize = require('sequelize');
 
 // database connection
 const connection = new Sequelize(
-  'database_api',
+  'login',
   'root',
-  '',
+  'Isna02#',
   {
     host: 'localhost',
     port: 3306,
@@ -12,4 +12,4 @@ const connection = new Sequelize(
   },
 );
 
-module.exports = connection;
+module.exports.connect = connection;
