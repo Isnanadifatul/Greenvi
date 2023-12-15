@@ -1,7 +1,7 @@
 {
   "name": "upcycle-shop-api",
   "version": "1.0.0",
-  "description": "ini adalah branch untuk development",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",

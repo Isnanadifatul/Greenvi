@@ -1,36 +1,39 @@
-const connection = require('../db-config');
 const { DataTypes } = require('sequelize');
-const mysql = require('mysql2/promise');
+const connection = require('../db-config/connect');
 
-const dbConnection = connection.connect;
-
-const Users = dbConnection.define('users', {
+// create database using models
+const Users = connection.define('users', {
     email: {
-        type: DataTypes.STRING,
-        primaryKey: true
+        type: DataTypes.STRING(25),
+        primaryKey: true,
     },
     password: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-    full_name: {
-        type: DataTypes.STRING
+    fullName: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-    date_of_birth: {
-        type: DataTypes.DATE
+    address: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
-    phone_number: {
-        type: DataTypes.STRING
+    dateOfBirth: {
+        type: DataTypes.DATE,
     },
-    registration_date: {
-        type: DataTypes.DATE
-    }
-},
-    {
-        freezeTablename: true,
-        timestamps: false
-    });
+    phoneNumber: {
+        type: DataTypes.STRING(20),
+        unique: true,
+    },
+}, {
+    freezeTableName: true,
+    timestamps: true,
+    updatedAt: false,
+    createdAt: 'registrationDate',
+});
 
-// Cek apakah username sudah ada
+// Check if email already exist
 const isUsernameExist = async (email) => {
     try {
         const existingUser = await Users.findOne({ where: { email } });
@@ -41,10 +44,17 @@ const isUsernameExist = async (email) => {
     }
 };
 
-// Insert user baru
-const insertUser = async (email, full_name, hashedPassword) => {
+// Insert new user
+const insertUser = async (email, hashedPassword, fullName, address, dateOfBirth, phoneNumber) => {
     try {
-        const newUser = await Users.create({ email, full_name, password: hashedPassword });
+        const newUser = await Users.create({
+            email,
+            password: hashedPassword,
+            fullName,
+            address,
+            dateOfBirth,
+            phoneNumber,
+        });
         console.log('User inserted:', newUser.toJSON());
     } catch (error) {
         console.error('Error inserting user:', error.message);
