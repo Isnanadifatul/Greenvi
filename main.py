@@ -8,7 +8,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 app = Flask(__name__)
 
 def get_data_from_sql():
-    pass
+    connection = pymysql.connect(host='localhost', port=330, user='root', password='', db='database_api')
+    query = "SELECT * FROM products"
+    df = pd.read_sql(query, connection)
+    connection.close()
+    return df
 
 
 def recommendation_new_product(product, top_n = 5):
@@ -20,15 +24,7 @@ def recommendation_new_product(product, top_n = 5):
 
 
 
-df = pd.read_csv('Capstone Dataset - product.csv')
-df = df.drop('Unnamed: 0', axis=1)
-df = df.drop('Unnamed: 7', axis=1)
-df = df.drop('Unnamed: 8', axis=1)
-df = df.drop('Unnamed: 9', axis=1)
-df = df.drop('Unnamed: 10', axis=1)
-df = df.drop('Unnamed: 11', axis=1)
-df = df.drop('Unnamed: 12', axis=1)
-df = df.drop('Unnamed: 13', axis=1) 
+df = get_data_from_sql()
 
 df['new_description'] = df['category'] + " " + df['deskripsi']
 
@@ -40,10 +36,9 @@ tfid_matrix = vectorizer.fit_transform(df['new_description'])
 def home():
     return "tes"
 
-# Route untuk menerima aktivitas input dan memberikan rekomendasi
+# Route untuk menerima produk input dan memberikan rekomendasi
 
-
-@app.route('/recommend', methods=['GET'])
+@app.route('/recommend', methods=['POST'])
 def get_recommendations():
     input_activity = request.args.get('activity')
     recommended_activities = recommendation_new_product(input_activity)

@@ -1,0 +1,4 @@
+Flask==2.2.2
+Pandas==1.2.4
+Pymysql==1.1.-
+scikit-learn==1.3.2
