@@ -1,29 +1,24 @@
-# Greenvi
+![Alt text](greenvi-logo-crop.png)
 
-In this repository we build API using hapi framework, this contains endpoints of users, products, and stores.
+# Bangkit Capstone Project by CH2-PS596
 
-**Dependencies**
+### About Greenvi
 
-- "@hapi/cookie": "^12.0.1"
-- "@hapi/hapi": "^21.3.2"
-- "@hapi/joi": "^17.1.1"
-- "bcryptjs": "^2.4.3"
-- "mysql2": "^3.6.5"
-- "nanoid": "^3.3.7"
-- "sequelize": "^6.35.1"
+Currently, the amount of waste in Indonesia is increasing. According to data from Kemenko PMK 2022, the national waste accumulation has reached 21.1 million tons. Out of the total national waste production, 34.29% is not well managed. One effort to reduce this waste is by recycling and turning it into usable items. From research on the internet, several organizations and individuals in places like Bali, Semarang, and other cities have contributed to managing waste by turning it into art or usable items. As a result, we strive to reduce waste in Indonesia by transforming it into usable items or works of art. Additionally, we aim to distribute products from recycled waste to create economic opportunities for communities.
 
-**Database Connection**
+### Our Team
 
-- you can go to "db-config/connect.js" then input your database name, root, password, host, and dialect.
+|    Student ID    | Student Name             | Origin of University              | Status |
+| :--------------: | ------------------------ | --------------------------------- | :----: |
+| (ML) M006BSX1169 | Elisabeth Situmorang     | Universitas Brawijaya             | Active |
+| (ML) M008BSY0599 | Fadhil Wirakusuma        | Universitas Gadjah Mada           | Active |
+| (ML) M272BSY0278 | Athar Fathana Rakasyah   | Universitas Muslim Indonesia      | Active |
+| (CC) C482BSX4214 | Isna Nadifatul Istiqomah | Sekolah Tinggi Teknologi Cipasung | Active |
+| (CC) C006BSY3589 | Daren Muhammad           | Universitas Brawijaya             | Active |
+| (MD) A482BSY2741 | Azky Ali Nuryafi         | Sekolah Tinggi Teknologi Cipasung | Active |
 
-**Database Tables**
+### Our Repositories
 
-- you can go to "models/...".
-
-**Endpoints**
-
-- you can go to "src/routes.js".
-
-**Logic/Handler**
-
-- you can go to "src/handlers-..." all of that are the logic/handler for users, products, and stores.
+- branch Machine Learning
+- branch Cloud Computing
+- branch Mobile Development
